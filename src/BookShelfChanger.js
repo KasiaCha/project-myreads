@@ -1,31 +1,30 @@
-import React, { Component } from 'react'
+import React, {Component} from 'react'
+import * as BooksAPI from './BooksAPI' 
 
 class BookShelfChanger extends Component {
+  state = {
+    shelf: "none"
+  };
+  
+  // method to change shelf, call changeShelf props
+  newShelf = (e, callback) => {
+    const shelf = e.target.value;
+    this.props.changeShelf(this.props.book, shelf);
+  };
 
-    state = {
-        shelf: ''
+  componentWillMount() {
+    if (this.props.shelf) {
+      this.setState({ shelf: this.props.shelf });
     }
+  }
 
-    componentWillMount() {
-        if (this.props.shelf) {
-          this.setState({ shelf: this.props.shelf });
-        }
-      }
-
-    // method to change shelf, call changeShelf props
-    newShelf(shelf) {
-        this.setState({shelf: shelf});
-        this.props.changeShelf(this.props.book, shelf);
-    }
-
-    render() {
-        
-        // Creating the select list
-      
+  render() {
+    // Creating the select list
     return (
-      <div className="book-shelf-changer">
+      <div className = "book-shelf-changer">
+      {/* Options button */}
         <select
-          className="bookshelf-select"
+          className = "bookshelf-select"
           defaultValue={this.state.shelf}
           onChange={this.newShelf}
         >
@@ -39,4 +38,5 @@ class BookShelfChanger extends Component {
     );
   }
 }
-export default BookShelfChanger
+
+export default BookShelfChanger;

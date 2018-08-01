@@ -1,45 +1,58 @@
-import React, { Component } from 'react'
-import BookShelf from './BookShelf'
+import React, {Component} from 'react'
+import NoImageCover from './icons/no-cover-image.png'
+import BookShelfChanger from './BookShelfChanger'
 
 class Book extends Component {
+    state = {
+    book: {}
+  };
+
+  componentWillMount() {
+    this.syncState();
+  }
+
+  syncState = () => {
+    for (let i = 0; i < this.props.books.length; i++) {
+      if (this.props.books[i].id === this.props.book.id) {
+        this.setState({book: this.props.books[i]});
+      }
+    }
+  };
+
   render() {
 
-    // Import the moveBook() method from BookShelf component via props 
-
-    const {title, authors, thumbnail, shelf, id, moveBook} = this.props
+    const {book, books, changeShelf} = this.props;
+    const bookCover = book.imageLinks && book.imageLinks.thumbnail ? book.imageLinks.thumbnail : NoImageCover;
+    const title = book.title ? book.title : "Book title unavailable";
 
     return (
-
-      <div className = "book">
-      <div className = "book-top">
-
-      <div className = "book-cover" style = {{ width: 128, height: 188, backgroundImage: 'url(' + thumbnail + ')' }}></div>
-
-          {/* Options button */}
-
-          <div className = "book-shelf-changer">
-            <select onChange = {event => {moveBook({id}, event.target.value)}} value = {shelf}>
-              <option value="none" disabled> Move to..</option>
-              <option value="currentlyReading">Currently Reading</option>
-              <option value="wantToRead">Want to Read</option>
-              <option value="read">Read</option>
-              <option value="none">None</option>
-            </select>
+      <li>
+        <div className = "book">
+          <div className = "book-top">
+            <div
+              className = "book-cover" style={{width: 128, height: 193, backgroundImage: `url(${bookCover})`}}
+            />
+            <BookShelfChanger
+              shelf={this.state.book.shelf}
+              book={book}
+              books={books}
+              changeShelf={changeShelf}
+            />
           </div>
+          {/* Book's title */}
+          <div className = "book-title">{title}</div>
+          {/* Book's author */}
+          {book.authors && book.authors.map((author, index) => (
+              <div className = "book-authors" key={index}>
+                {author}
+              </div>
+            ))}
+            {!book.authors &&
+            <div className = "book-authors">Unknown Author</div>}
         </div>
-
-        {/* Book's title */}
-
-        <div className = "book-title">{title}</div>
-
-        {/* Book's author */}
-
-        <div className = "book-authors">{authors}</div>
-
-      </div>
-
-    )
+      </li>
+    );
   }
 }
 
-export default Book
+export default Book;

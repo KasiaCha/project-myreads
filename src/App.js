@@ -1,58 +1,49 @@
-import React, { Component } from 'react';
-import './App.css';
-import { Route } from 'react-router-dom'
-import BookShelf from './BookShelf'
-import BookShelfChanger from './BookShelfChanger'
-import Search from './Search'
-import * as BooksAPI from './BooksAPI'
+import React , {Component} from "react"
+import "./App.css"
+import {Route} from "react-router-dom"
+import BooksList from "./BooksList"
+import Search from "./Search"
+import * as BooksAPI from "./BooksAPI"
 
 class App extends Component {
-
   state = {
-    books : []
-  }
-
-  // get the books from database
-  
-  getBooks = () => {
-    BooksAPI.getAll().then(books => {
-      this.setState({books})
-    })
-  }
-
-  // moveBook will take in an id, store it as an object and also a shelf destination
-
-  moveBook = (id, shelf) => {
-    BooksAPI.update(id,shelf)
-    this.getBooks()
-  }
+    books: []
+  };
 
   // call method to fetch books on load
-  
-  componentDidMount() {
-    this.getBooks()
+  componentWillMount() {
+    BooksAPI.getAll().then(data => {
+      this.setState({books: data});
+    });
   }
 
+   moveBook = (book, shelf) => {
+    BooksAPI.update(book, shelf).then(() => {
+      BooksAPI.getAll().then(data => {
+        this.setState({books: data});
+      });
+    });
+  };
+
   render() {
-    return (
-
-      <div className = "app">
-        <Route exact path = '/' render={() => (
-          <BookShelf
-            books = {this.state.books}
-            getBooks = {this.getBooks}
-            moveBook = {this.moveBook}
-          />
-        )} />
-        <Route path = '/search' render={() => (
-          <Search
-            moveBook = {this.moveBook}
-            getBooks = {this.getBooks}
-          />
-          )} />
-          </div>
-        );
-      }
+    if (this.state.books.length < 1) {
+      return (
+        <div className = "pre-app"></div>
+      );
     }
+    if (this.state.books.length >= 1) {
+      return (
+        <div className = "app">
+          <Route exact path = "/" render={() => (
+          <BooksList books={this.state.books} changeShelf={this.moveBook}/>)}
+          />
+          <Route path = "/search" render={() => (
+          <Search books={this.state.books} changeShelf={this.moveBook}/>)}
+          />
+        </div>
+      );
+    }
+  }
+}
 
-          export default App;
+export default App;
