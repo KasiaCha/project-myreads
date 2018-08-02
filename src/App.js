@@ -16,14 +16,16 @@ class App extends Component {
       this.setState({books: data});
     });
   }
-
-   moveBook = (book, shelf) => {
-    BooksAPI.update(book, shelf).then(() => {
-      BooksAPI.getAll().then(data => {
-        this.setState({books: data});
-      });
-    });
-  };
+  
+  moveBook = (book , shelf) => {
+    BooksAPI.update(book, shelf)
+          .then(() => {
+            book.shelf = shelf;
+            this.setState(state => ({
+              books: state.books.filter(item => item.id !== book.id).concat([book])
+            }))
+          })
+    }
 
   render() {
     if (this.state.books.length < 1) {
